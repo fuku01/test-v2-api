@@ -2,6 +2,8 @@ type Todo {
   id: ID!
   title: String!
   content: String!
+  createdAt: Time!
+  updatedAt: Time!
 }
 
 extend type Query {
