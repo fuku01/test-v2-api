@@ -1,0 +1,46 @@
+# docker-compose.ymlの書き方については、公式ドキュメントを参照(https://docs.docker.com/compose/compose-file/)
+
+services:
+  api: # サービス名（API）
+    build: # ビルドに使うDockerファイルのパス
+      context: . # イメージのビルドコンテキストとして、現在のディレクトリを指定
+      dockerfile: Dockerfile # ビルドに使うDockerファイルの相対パス
+    tty: true # コンテナの永続化（コンテナが終了しないようにする）
+    environment: # 環境変数
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_TEST_DATABASE: ${MYSQL_TEST_DATABASE}
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_PORT: ${MYSQL_PORT}
+      # GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS}
+    ports:
+      - 4000:4000 # ポート番号を指定（ホスト側:コンテナ側）※番号は任意で他のコンテナと被らないようにする
+    volumes:
+      - ./:/go/src/app # マウントディレクトリ
+    depends_on:
+      db:
+        condition: service_healthy # dbが起動してからapiを起動する
+
+  db: # サービス名（DB）
+    image: mysql:8.3.0 # 既存のイメージをそのまま使用（https://hub.docker.com/_/mysql）
+    ports:
+      - "3306:3306" # ポート番号は任意で他のコンテナと被らないようにする
+    # 記載はしているが基本的に下記は使う予定はない
+    volumes:
+      #mysql.cnfを反映させるためのディレクトリ
+      - ./mysql/conf.d:/etc/mysql/conf.d
+        #DBの実体を残したい場合にはコメントアウトを外す
+      # - ./mysql/data:/var/lib/mysql
+      #MySQL初回起動時に実行するsqlやsh等を渡すためのディレクトリ
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    environment: # 環境変数
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_HOST: "%"
+    healthcheck: # コンテナが正常に動作しているかを確認するための機能
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"] # ヘルスチェックのコマンド
+      interval: 10s # 10秒ごとにヘルスチェックを行う
+      timeout: 10s # タイムアウト時間
+      retries: 10 # リトライ回数
+

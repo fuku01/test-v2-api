@@ -1,0 +1,73 @@
+package main
+
+import (
+	"context"
+	"log"
+	"net/http"
+	"strconv"
+
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
+	graph "github.com/fuku01/test-v2-api/pkg/graph/generated"
+
+	"github.com/rs/cors"
+
+	"github.com/fuku01/test-v2-api/config"
+
+	h "github.com/fuku01/test-v2-api/pkg/handler"
+	todo_handler "github.com/fuku01/test-v2-api/pkg/handler"
+	todo_repository "github.com/fuku01/test-v2-api/pkg/infrastructure"
+	todo_usecase "github.com/fuku01/test-v2-api/pkg/usecase"
+)
+
+func requestContextMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "httpRequest", r)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func main() {
+	port := 4000
+
+	db, err := config.NewDatabase()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 依存性の注入
+	tr := todo_repository.NewTodoRepository(db)
+	tu := todo_usecase.NewTodoUsecase(tr)
+	th := todo_handler.NewTodoHandler(tu)
+
+	h := h.Handler{
+		TodoHandler: th,
+	}
+
+	srv := handler.NewDefaultServer(
+		graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
+			Handler: h,
+		}}),
+	)
+
+	// ルーティングの設定
+	http.Handle("/query", requestContextMiddleware(srv))
+	// GraphQL Playgroundの設定
+	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+
+	// CORSの設定
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"}, // すべてのオリジンを許可
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
+	})
+	handler := c.Handler(http.DefaultServeMux)
+
+	log.Printf("connect to http://localhost:%d/ for GraphQL playground", port)
+
+	// サーバーの起動
+	err = http.ListenAndServe(":"+strconv.Itoa(port), handler)
+	if err != nil {
+		log.Fatalf("failed to start HTTP server: %v", err)
+	}
+}
