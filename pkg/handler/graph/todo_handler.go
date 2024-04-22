@@ -1,4 +1,4 @@
-package handler
+package graph
 
 import (
 	"fmt"
@@ -49,7 +49,6 @@ func convTodo(todo *domain_model.Todo) *model.Todo {
 
 	return &model.Todo{
 		ID:        strconv.FormatUint(uint64(todo.ID), 10),
-		Title:     todo.Title,
 		Content:   todo.Content,
 		CreatedAt: todo.CreatedAt,
 		UpdatedAt: todo.UpdatedAt,

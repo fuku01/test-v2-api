@@ -11,6 +11,9 @@ type User struct {
 
 type Todo struct {
 	gorm.Model
-	Title   string
+	Content string
+}
+
+type CreateTodoInput struct {
 	Content string
 }

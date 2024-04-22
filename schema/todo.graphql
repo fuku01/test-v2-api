@@ -1,5 +1,7 @@
 type Todo {
   id: ID!
+  userId: String!
+  channel: String!
   title: String!
   content: String!
   createdAt: Time!

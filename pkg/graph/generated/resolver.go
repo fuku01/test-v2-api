@@ -1,6 +1,6 @@
 package graph
 
-import "github.com/fuku01/test-v2-api/pkg/handler"
+import handler "github.com/fuku01/test-v2-api/pkg/handler/graph"
 
 // This file will not be regenerated automatically.
 //

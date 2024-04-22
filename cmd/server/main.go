@@ -15,8 +15,9 @@ import (
 
 	"github.com/fuku01/test-v2-api/config"
 
-	h "github.com/fuku01/test-v2-api/pkg/handler"
-	todo_handler "github.com/fuku01/test-v2-api/pkg/handler"
+	h "github.com/fuku01/test-v2-api/pkg/handler/graph"
+	todo_handler "github.com/fuku01/test-v2-api/pkg/handler/graph"
+	webhook_handler "github.com/fuku01/test-v2-api/pkg/handler/webhook"
 	todo_repository "github.com/fuku01/test-v2-api/pkg/infrastructure"
 	todo_usecase "github.com/fuku01/test-v2-api/pkg/usecase"
 )
@@ -41,6 +42,8 @@ func main() {
 	tu := todo_usecase.NewTodoUsecase(tr)
 	th := todo_handler.NewTodoHandler(tu)
 
+	wh := webhook_handler.NewWebhookHandler(tu)
+
 	h := h.Handler{
 		TodoHandler: th,
 	}
@@ -50,8 +53,7 @@ func main() {
 		slack.SlackURLVerification(w, r)
 	})
 	http.HandleFunc("/slack/events", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("slack/eventsが呼ばれました")
-		th.ListTodos()
+		wh.CreateTodo(w, r)
 	})
 
 	// GraphQL ルーティングするハンドラーの設定
