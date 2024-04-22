@@ -2,7 +2,9 @@ package webhook
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 
 	"github.com/fuku01/test-v2-api/pkg/domain/model"
@@ -26,30 +28,24 @@ func NewWebhookHandler(tu usecase.TodoUsecase) WebhookHandler {
 
 func (h *webhookHandler) CreateTodo(w http.ResponseWriter, r *http.Request) error {
 
-	eventsAPIEvent, err := h.parseWebhookSlackEvents(w, r)
+	eventsAPIEvent, err := h.parseSlackEventsAPIRequest(w, r)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return err
+	}
+	event, err := h.checkSlackEventsAPIEvent(eventsAPIEvent)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return err
 	}
 
-	var input *model.CreateTodoInput
-	if eventsAPIEvent.Type == slackevents.CallbackEvent {
-		innerEvent := eventsAPIEvent.InnerEvent
-		switch ev := innerEvent.Data.(type) {
-		case *slackevents.MessageEvent:
-			input = &model.CreateTodoInput{
-				Content: ev.Text,
-			}
-		}
+	input := &model.CreateTodoInput{
+		Content: event.Text,
 	}
-
-	if input == nil {
-		return nil
-	}
-
 	todo, err := h.tu.CreateTodo(input)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		slog.Error(err.Error())
 		return err
 	}
 
@@ -59,7 +55,8 @@ func (h *webhookHandler) CreateTodo(w http.ResponseWriter, r *http.Request) erro
 	return nil
 }
 
-func (h *webhookHandler) parseWebhookSlackEvents(w http.ResponseWriter, r *http.Request) (*slackevents.EventsAPIEvent, error) {
+// SlackEventAPIからのHTTPリクエスト(Body)から、イベントデータをパースする処理
+func (h *webhookHandler) parseSlackEventsAPIRequest(w http.ResponseWriter, r *http.Request) (*slackevents.EventsAPIEvent, error) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -72,4 +69,21 @@ func (h *webhookHandler) parseWebhookSlackEvents(w http.ResponseWriter, r *http.
 	}
 
 	return &eventsAPIEvent, nil
+}
+
+// SlackEventAPIのEventがコールバックイベントかつ、メッセージイベントであるかをチェックする処理
+func (h *webhookHandler) checkSlackEventsAPIEvent(events *slackevents.EventsAPIEvent) (*slackevents.MessageEvent, error) {
+	// イベントがコールバックイベントであるかをチェック
+	if events.Type != slackevents.CallbackEvent {
+		return nil, fmt.Errorf("event type is not callback event")
+	}
+
+	// イベントがメッセージイベントであるかをチェック
+	event, ok := events.InnerEvent.Data.(*slackevents.MessageEvent)
+	if !ok {
+		return nil, fmt.Errorf("inner event is not message event")
+	}
+
+	return event, nil
+
 }
