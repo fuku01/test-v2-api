@@ -48,11 +48,11 @@ func main() {
 		TodoHandler: th,
 	}
 
-	// Slack Webhookのエンドポイントの設定
+	// SlackEventAPI(Webhook) エンドポイントの設定
 	http.HandleFunc("/slack/events/verification", func(w http.ResponseWriter, r *http.Request) {
 		slack.SlackURLVerification(w, r)
 	})
-	http.HandleFunc("/slack/events", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/slack/events/create", func(w http.ResponseWriter, r *http.Request) {
 		wh.CreateTodo(w, r)
 	})
 
