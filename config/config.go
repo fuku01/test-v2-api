@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/slack-go/slack"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -34,4 +35,15 @@ func NewDatabase() (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 	return db, nil
+}
+
+// Slackのクライアントを生成する
+func NewSlack() (*slack.Client, error) {
+	botToken := os.Getenv("SLACK_BOT_TOKEN")
+	if botToken == "" {
+		return nil, fmt.Errorf("環境変数が不足しています。SLACK_BOT_TOKEN: %s", botToken)
+	}
+
+	slackClient := slack.New(botToken)
+	return slackClient, nil
 }

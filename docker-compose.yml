@@ -13,7 +13,7 @@ services:
       MYSQL_TEST_DATABASE: ${MYSQL_TEST_DATABASE}
       MYSQL_HOST: ${MYSQL_HOST}
       MYSQL_PORT: ${MYSQL_PORT}
-      # GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS}
+      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
     ports:
       - 4000:4000 # ポート番号を指定（ホスト側:コンテナ側）※番号は任意で他のコンテナと被らないようにする
     volumes:
