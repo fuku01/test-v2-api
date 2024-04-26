@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
+	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -23,7 +23,7 @@ import (
 )
 
 func main() {
-	port := 4000
+	port := os.Getenv("PORT")
 
 	db, err := config.NewDatabase()
 	if err != nil {
@@ -53,6 +53,7 @@ func main() {
 		slack.SlackURLVerification(w, r)
 	})
 	http.HandleFunc("/slack/events/create", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("SlackEventAPI(Webhook) が呼ばれました！！！！！！！！！！")
 		wh.CreateTodo(w, r)
 	})
 
@@ -75,10 +76,10 @@ func main() {
 	})
 	httpHandler := c.Handler(http.DefaultServeMux)
 
-	log.Printf("connect to http://localhost:%d/ for GraphQL playground", port)
+	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 
 	// サーバーの起動
-	err = http.ListenAndServe(":"+strconv.Itoa(port), httpHandler)
+	err = http.ListenAndServe(":"+port, httpHandler)
 	if err != nil {
 		log.Fatalf("failed to start HTTP server: %v", err)
 	}

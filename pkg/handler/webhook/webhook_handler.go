@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"regexp"
 
 	"github.com/fuku01/test-v2-api/pkg/domain/model"
 	"github.com/fuku01/test-v2-api/pkg/usecase"
@@ -39,8 +40,12 @@ func (h *webhookHandler) CreateTodo(w http.ResponseWriter, r *http.Request) erro
 		return err
 	}
 
+	// メンションされたユーザー名を削除
+	re := regexp.MustCompile(`<@[^>]+>`)
+	message := re.ReplaceAllString(event.Text, "")
+
 	input := &model.CreateTodoInput{
-		Content: event.Text,
+		Content: message,
 	}
 	todo, err := h.tu.CreateTodo(input)
 	if err != nil {
@@ -71,15 +76,15 @@ func (h *webhookHandler) parseSlackEventsAPIRequest(w http.ResponseWriter, r *ht
 	return &eventsAPIEvent, nil
 }
 
-// SlackEventAPIのEventがコールバックイベントかつ、メッセージイベントであるかをチェックする処理
-func (h *webhookHandler) checkSlackEventsAPIEvent(events *slackevents.EventsAPIEvent) (*slackevents.MessageEvent, error) {
+// SlackEventAPIのEventがコールバックイベントかつ、メンションイベントであるかをチェックする処理
+func (h *webhookHandler) checkSlackEventsAPIEvent(events *slackevents.EventsAPIEvent) (*slackevents.AppMentionEvent, error) {
 	// イベントがコールバックイベントであるかをチェック
 	if events.Type != slackevents.CallbackEvent {
 		return nil, fmt.Errorf("event type is not callback event")
 	}
 
-	// イベントがメッセージイベントであるかをチェック
-	event, ok := events.InnerEvent.Data.(*slackevents.MessageEvent)
+	// イベントがメンションイベントであるかをチェック
+	event, ok := events.InnerEvent.Data.(*slackevents.AppMentionEvent)
 	if !ok {
 		return nil, fmt.Errorf("inner event is not message event")
 	}
