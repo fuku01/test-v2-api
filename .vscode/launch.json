@@ -14,6 +14,25 @@
             "host": "localhost",
             "showLog": true,
             "trace": "verbose",
+        },
+        {
+            "name": "ローカルでデバッグ",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "cmd/server/main.go", // メインのGoファイルへのパス
+            "env": {
+                "PORT": "4000",
+                "MYSQL_USER": "root",
+                "MYSQL_PASSWORD": "pass",
+                "MYSQL_DATABASE": "v2_development",
+                "MYSQL_TEST_DATABASE": "test_v2",
+                "MYSQL_HOST": "127.0.0.1",
+                "MYSQL_PORT": "3306",
+                "SLACK_BOT_TOKEN": "xoxb-6221480812340-6993703419444-ohtzgLjhvrhrTnewJb6pL4Iy"
+            },
+            // "showLog": true,
+            // "trace": "verbose"
         }
     ]
 }

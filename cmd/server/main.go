@@ -53,7 +53,7 @@ func main() {
 		slack.SlackURLVerification(w, r)
 	})
 	http.HandleFunc("/slack/events/create", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("SlackEventAPI(Webhook) が呼ばれました！！！！！！！！！！")
+		fmt.Println("========================SlackEventAPI(Webhook) が呼ばれました==============================")
 		wh.CreateTodo(w, r)
 	})
 

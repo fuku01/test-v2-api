@@ -25,11 +25,9 @@ func NewTodoHandler(tu usecase.TodoUsecase) TodoHandler {
 }
 
 func (h *todoHandler) ListTodos() ([]*model.Todo, error) {
-	todos, err := h.tu.ListTodos()
+	fmt.Println("========================ListTodos()が呼ばれました==============================")
 
-	for _, todo := range todos {
-		fmt.Printf("%+v\n", todo)
-	}
+	todos, err := h.tu.ListTodos()
 
 	if err != nil {
 		return nil, err
