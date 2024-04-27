@@ -24,6 +24,9 @@ RUN go install github.com/cosmtrek/air@v1.49.0
 RUN go install github.com/99designs/gqlgen@latest
 RUN go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
+# delve（dockeコンテナ内でデバッグを行うためのツール）をインストール
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+
 # go.modを参照し、go.sumファイルの更新を行う
 RUN go mod tidy
 

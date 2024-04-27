@@ -1,5 +1,4 @@
 # docker-compose.ymlの書き方については、公式ドキュメントを参照(https://docs.docker.com/compose/compose-file/)
-
 services:
   api: # サービス名（API）
     build: # ビルドに使うDockerファイルのパス
@@ -7,6 +6,7 @@ services:
       dockerfile: Dockerfile # ビルドに使うDockerファイルの相対パス
     tty: true # コンテナの永続化（コンテナが終了しないようにする）
     environment: # 環境変数
+      PORT: ${PORT}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -16,6 +16,7 @@ services:
       SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
     ports:
       - 4000:4000 # ポート番号を指定（ホスト側:コンテナ側）※番号は任意で他のコンテナと被らないようにする
+      - 2345:2345 # dlv（dockerコンテナ内でデバッグを行うためのツール）用のポート番号
     volumes:
       - ./:/go/src/app # マウントディレクトリ
     depends_on:
