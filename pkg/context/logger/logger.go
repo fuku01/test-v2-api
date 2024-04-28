@@ -9,6 +9,8 @@ import (
 	"runtime"
 )
 
+// 以下のようにログを出力する
+// 2024/05/01 02:50:00 ERROR error to SampleFunc "err message"=サンプルエラーメッセージ file=../../pkg/sample/sample_file.go line=50
 func Error(funcName string, err error) {
 	_, file, line, ok := runtime.Caller(1) // エラーが発生したファイル名と行数を取得
 	if !ok {
