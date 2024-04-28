@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/fuku01/test-v2-api/pkg/domain/model"
+	domain_model "github.com/fuku01/test-v2-api/pkg/domain/model"
 	"github.com/fuku01/test-v2-api/pkg/usecase"
 	"github.com/slack-go/slack/slackevents"
 )
@@ -18,10 +18,10 @@ type WebhookHandler interface {
 }
 
 type webhookHandler struct {
-	tu usecase.TodoUsecase
+	tu usecase.MessageUsecase
 }
 
-func NewWebhookHandler(tu usecase.TodoUsecase) WebhookHandler {
+func NewWebhookHandler(tu usecase.MessageUsecase) WebhookHandler {
 	return &webhookHandler{
 		tu: tu,
 	}
@@ -62,10 +62,10 @@ func (h *webhookHandler) CreateTodo(w http.ResponseWriter, r *http.Request) {
 		}
 		message := h.replaceSlackMentionEventText(event)
 
-		input := &model.CreateTodoInput{
+		input := &domain_model.CreateMessageInput{
 			Content: message,
 		}
-		_, err = h.tu.CreateTodo(input)
+		_, err = h.tu.CreateMessage(input)
 		if err != nil {
 			errChan <- err
 			return

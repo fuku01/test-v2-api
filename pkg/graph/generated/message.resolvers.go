@@ -6,17 +6,11 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/fuku01/test-v2-api/pkg/graph/generated/model"
 )
 
-// Todo is the resolver for the todo field.
-func (r *queryResolver) Todo(ctx context.Context, id string) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todo - todo"))
-}
-
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return r.Handler.TodoHandler.ListTodos()
+// Messages is the resolver for the messages field.
+func (r *queryResolver) Messages(ctx context.Context) ([]*model.Message, error) {
+	return r.Handler.MessageHandler.ListMessages()
 }

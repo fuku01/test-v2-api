@@ -4,7 +4,21 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"time"
+
+	"github.com/slack-go/slack"
 )
+
+type Slack struct {
+	client *slack.Client
+}
+
+func NewSlack(slackToken string) (*Slack, error) {
+	client := slack.New(slackToken)
+	return &Slack{
+		client: client,
+	}, nil
+}
 
 /*
 Slack Event APIを初めて利用する際にURLVerification(検証)を行うための処理
@@ -41,4 +55,33 @@ func SlackURLVerification(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(reqBody.Challenge))
 		return
 	}
+}
+
+type SlackMessageInput struct {
+	ChannelID string
+	Message   string
+}
+type SlackMessageResponse struct {
+	ChannelID string
+	Message   string
+	PostAt    time.Time
+}
+
+func (s *Slack) SlackPostMessage(input *SlackMessageInput) (*SlackMessageResponse, error) {
+
+	channel, postAt, err := s.client.PostMessage(input.ChannelID, slack.MsgOptionText(input.Message, false))
+	if err != nil {
+		return nil, err
+	}
+
+	timePostAt, err := time.Parse(time.RFC3339, postAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &SlackMessageResponse{
+		ChannelID: channel,
+		Message:   input.Message,
+		PostAt:    timePostAt,
+	}, nil
 }

@@ -6,17 +6,14 @@ import (
 	"time"
 )
 
-type Query struct {
-}
-
-type Todo struct {
+type Message struct {
 	ID        string    `json:"id"`
-	UserID    string    `json:"userId"`
-	Channel   string    `json:"channel"`
-	Title     string    `json:"title"`
 	Content   string    `json:"content"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+type Query struct {
 }
 
 type User struct {

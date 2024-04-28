@@ -1,4 +1,4 @@
-CREATE TABLE `todos` (
+CREATE TABLE `messages` (
     -- UNSIGNEDは符号なし整数, AUTO_INCREMENTは自動採番
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `content` TEXT,

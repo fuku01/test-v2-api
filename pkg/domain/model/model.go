@@ -1,19 +1,23 @@
-package model
+package domain_model
 
 import (
-	"gorm.io/gorm"
+	"time"
 )
 
 type User struct {
-	gorm.Model
-	Name string
+	ID        uint
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
-type Todo struct {
-	gorm.Model
-	Content string
+type Message struct {
+	ID        uint
+	Content   string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
-type CreateTodoInput struct {
+type CreateMessageInput struct {
 	Content string
 }

@@ -16,21 +16,28 @@ import (
 	"github.com/fuku01/test-v2-api/config"
 
 	h "github.com/fuku01/test-v2-api/pkg/handler/graph"
-	todo_handler "github.com/fuku01/test-v2-api/pkg/handler/graph"
+	message_handler "github.com/fuku01/test-v2-api/pkg/handler/graph"
 	webhook_handler "github.com/fuku01/test-v2-api/pkg/handler/webhook"
-	todo_repository "github.com/fuku01/test-v2-api/pkg/infrastructure"
-	todo_usecase "github.com/fuku01/test-v2-api/pkg/usecase"
+	message_repository "github.com/fuku01/test-v2-api/pkg/infrastructure"
+	message_usecase "github.com/fuku01/test-v2-api/pkg/usecase"
 )
 
 func main() {
 	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatalf("環境変数が不足しています。PORT: %s", port)
+	}
+	slackToken := os.Getenv("SLACK_BOT_TOKEN")
+	if slackToken == "" {
+		log.Fatalf("環境変数が不足しています。SLACK_BOT_TOKEN: %s", slackToken)
+	}
 
 	db, err := config.NewDatabase()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	slackClient, err := config.NewSlack()
+	slackClient, err := slack.NewSlack(slackToken)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -38,14 +45,14 @@ func main() {
 	fmt.Println("slackClient: ", slackClient) //!後で消す
 
 	// 依存性の注入
-	tr := todo_repository.NewTodoRepository(db)
-	tu := todo_usecase.NewTodoUsecase(tr)
-	th := todo_handler.NewTodoHandler(tu)
+	tr := message_repository.NewMessageRepository(db)
+	tu := message_usecase.NewMessageUsecase(tr)
+	th := message_handler.NewMessageHandler(tu)
 
 	wh := webhook_handler.NewWebhookHandler(tu)
 
 	h := h.Handler{
-		TodoHandler: th,
+		MessageHandler: th,
 	}
 
 	// SlackEventAPI(Webhook) エンドポイントの設定
