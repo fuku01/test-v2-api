@@ -13,6 +13,20 @@ type Message struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+type Mutation struct {
+}
+
+type PostMessageInput struct {
+	Message   string `json:"message"`
+	ChannelID string `json:"channelID"`
+}
+
+type PostMessagePayload struct {
+	Message   string    `json:"message"`
+	ChannelID string    `json:"channelID"`
+	PostAt    time.Time `json:"postAt"`
+}
+
 type Query struct {
 }
 

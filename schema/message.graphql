@@ -5,6 +5,22 @@ type Message {
   updatedAt: Time!
 }
 
+# Slackへのメッセージ送信と結果用の型
+input PostMessageInput {
+  message: String!
+  channelID: String!
+}
+type PostMessagePayload {
+  message: String!
+  channelID: String!
+  postAt: Time!
+}
+
 extend type Query {
   messages: [Message!]
+}
+
+extend type Mutation {
+  # Slackへメッセージを送信する処理
+  postMessage(input: PostMessageInput!): PostMessagePayload!
 }

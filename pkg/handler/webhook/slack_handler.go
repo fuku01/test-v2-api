@@ -3,11 +3,12 @@ package webhook
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
-	"log/slog"
 	"net/http"
 	"regexp"
 
+	"github.com/fuku01/test-v2-api/pkg/context/logger"
 	domain_model "github.com/fuku01/test-v2-api/pkg/domain/model"
 	"github.com/fuku01/test-v2-api/pkg/usecase"
 	"github.com/slack-go/slack/slackevents"
@@ -29,12 +30,15 @@ func NewSlackHandler(tu usecase.MessageUsecase) SlackHandler {
 }
 
 func (h *slackHandler) CreateTodo(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("---------------------スラックイベントAPIのCreateTodo()が呼ばれました---------------------")
+
 	// HTTPリクエストからコンテキストを取得
 	ctx := r.Context()
 
 	// SlackEventAPIのリクエストをチェック
 	body, err := h.checkSlackEventsAPIRequest(r)
 	if err != nil {
+		logger.Error("checkSlackEventsAPIRequest", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -82,7 +86,7 @@ func (h *slackHandler) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		err := <-errChan
 		if err != nil {
-			slog.Error("failed to goroutine: in CreateTodo: ", err)
+			logger.Error("goroutine in CreateTodo", err)
 		}
 	}()
 }
@@ -98,7 +102,6 @@ func (h *slackHandler) checkSlackEventsAPIRequest(r *http.Request) ([]byte, erro
 	// HTTPリクエストからBodyを読み込む
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		slog.Error("io.ReadAll: failed to read http request body: ", err)
 		return nil, err
 	}
 
@@ -110,7 +113,6 @@ func (h *slackHandler) parseSlackEventsAPIRequestBody(body []byte) (*slackevents
 	// BodyをパースしてSlackEventsAPIのイベントデータを取得
 	eventsAPIEvent, err := slackevents.ParseEvent(json.RawMessage(body), slackevents.OptionNoVerifyToken())
 	if err != nil {
-		slog.Error("slackevents.ParseEvent: failed to parse request body: ", err)
 		return nil, err
 	}
 
@@ -121,14 +123,12 @@ func (h *slackHandler) parseSlackEventsAPIRequestBody(body []byte) (*slackevents
 func (h *slackHandler) checkSlackEventsAPIEvent(events *slackevents.EventsAPIEvent) (*slackevents.AppMentionEvent, error) {
 	// イベントがコールバックイベントであるかをチェック
 	if events.Type != slackevents.CallbackEvent {
-		slog.Error("checkSlackEventsAPIEvent: event type is not callback event")
 		return nil, errors.New("event type is not callback event")
 	}
 
 	// イベントがメンションイベントであるかをチェック
 	event, ok := events.InnerEvent.Data.(*slackevents.AppMentionEvent)
 	if !ok {
-		slog.Error("checkSlackEventsAPIEvent: inner event is not message event")
 		return nil, errors.New("inner event is not message event")
 	}
 

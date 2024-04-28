@@ -1,5 +1,14 @@
 package logger
 
+import (
+	"fmt"
+	"log/slog"
+)
+
+func Error(funcName string, err error) {
+	slog.Error(fmt.Sprintf("failed to %s", funcName), slog.String("err message", err.Error()))
+}
+
 //! 一旦は導入見送りのためコメントアウト
 
 // import (

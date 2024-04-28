@@ -1,6 +1,10 @@
 package chat
 
 import (
+	"context"
+	"fmt"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/slack-go/slack"
@@ -10,24 +14,30 @@ type Slack struct {
 	client *slack.Client
 }
 
-func NewSlack(slackToken string) (*Slack, error) {
-	client := slack.New(slackToken)
+func NewSlack() (*Slack, error) {
+	token := os.Getenv("SLACK_BOT_TOKEN")
+	if token == "" {
+		return nil, fmt.Errorf("環境変数 SLACK_BOT_TOKEN が設定されていません")
+	}
+	client := slack.New(token)
+
 	return &Slack{
 		client: client,
 	}, nil
 }
 
-func (s *Slack) PostMessage(req *PostMessageRequest) (*PostMessageResponse, error) {
-
+func (s *Slack) PostMessage(ctx context.Context, req *PostMessageRequest) (*PostMessageResponse, error) {
 	channel, postAt, err := s.client.PostMessage(req.ChannelID, slack.MsgOptionText(req.Message, false))
 	if err != nil {
 		return nil, err
 	}
 
-	timePostAt, err := time.Parse(time.RFC3339, postAt)
+	// SlackのPostAtはUnixタイムスタンプで返ってくるので、time.Timeに変換する
+	timestamp, err := strconv.ParseFloat(postAt, 64)
 	if err != nil {
 		return nil, err
 	}
+	timePostAt := time.Unix(int64(timestamp), 0)
 
 	return &PostMessageResponse{
 		ChannelID: channel,

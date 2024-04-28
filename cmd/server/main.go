@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -22,14 +21,17 @@ import (
 	message_usecase "github.com/fuku01/test-v2-api/pkg/usecase"
 )
 
+func httpHandlerFuncMiddleware(handlerFunc func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
+	httpHandlerFunc := func(w http.ResponseWriter, r *http.Request) {
+		handlerFunc(w, r)
+	}
+	return httpHandlerFunc
+}
+
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Fatalf("環境変数が不足しています。PORT: %s", port)
-	}
-	slackToken := os.Getenv("SLACK_BOT_TOKEN")
-	if slackToken == "" {
-		log.Fatalf("環境変数が不足しています。SLACK_BOT_TOKEN: %s", slackToken)
+		log.Fatalf("環境変数 PORT が設定されていません")
 	}
 
 	db, err := config.NewDatabase()
@@ -37,16 +39,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	slackClient, err := chat.NewSlack(slackToken)
+	chatClient, err := chat.NewSlack()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("slackClient: ", slackClient) //!後で消す
-
 	// 依存性の注入
 	tr := message_repository.NewMessageRepository(db)
-	tu := message_usecase.NewMessageUsecase(tr)
+	tu := message_usecase.NewMessageUsecase(tr, chatClient)
 	th := message_handler.NewMessageHandler(tu)
 
 	wh := webhook_handler.NewSlackHandler(tu)
@@ -56,13 +56,8 @@ func main() {
 	}
 
 	// SlackEventAPI(Webhook) エンドポイントの設定
-	http.HandleFunc("/slack/events/verification", func(w http.ResponseWriter, r *http.Request) {
-		wh.SlackURLVerification(w, r)
-	})
-	http.HandleFunc("/slack/events/create", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("========================SlackEventAPI(Webhook) が呼ばれました==============================")
-		wh.CreateTodo(w, r)
-	})
+	http.HandleFunc("/slack/events/verification", httpHandlerFuncMiddleware(wh.SlackURLVerification))
+	http.HandleFunc("/slack/events/create", httpHandlerFuncMiddleware(wh.CreateTodo))
 
 	// GraphQL ルーティングするハンドラーの設定
 	srv := handler.NewDefaultServer(

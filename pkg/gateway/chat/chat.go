@@ -1,19 +1,22 @@
 package chat
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 // Chatインターフェースは、中身がSlackであるかどうかを知らない
 
 type Chat interface {
-	PostMessage(input *PostMessageRequest) (*PostMessageResponse, error)
+	PostMessage(ctx context.Context, input *PostMessageRequest) (*PostMessageResponse, error)
 }
 
 type PostMessageRequest struct {
-	ChannelID string
 	Message   string
+	ChannelID string
 }
 type PostMessageResponse struct {
-	ChannelID string
 	Message   string
+	ChannelID string
 	PostAt    time.Time
 }
