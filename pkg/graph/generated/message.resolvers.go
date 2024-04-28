@@ -12,5 +12,5 @@ import (
 
 // Messages is the resolver for the messages field.
 func (r *queryResolver) Messages(ctx context.Context) ([]*model.Message, error) {
-	return r.Handler.MessageHandler.ListMessages()
+	return r.Handler.MessageHandler.ListMessages(ctx)
 }

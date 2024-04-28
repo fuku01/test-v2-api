@@ -29,6 +29,9 @@ func NewSlackHandler(tu usecase.MessageUsecase) SlackHandler {
 }
 
 func (h *slackHandler) CreateTodo(w http.ResponseWriter, r *http.Request) {
+	// HTTPリクエストからコンテキストを取得
+	ctx := r.Context()
+
 	// SlackEventAPIのリクエストをチェック
 	body, err := h.checkSlackEventsAPIRequest(r)
 	if err != nil {
@@ -63,10 +66,10 @@ func (h *slackHandler) CreateTodo(w http.ResponseWriter, r *http.Request) {
 		}
 		message := h.replaceSlackMentionEventText(event)
 
-		input := &domain_model.CreateMessageInput{
+		req := &domain_model.CreateMessageRequest{
 			Content: message,
 		}
-		_, err = h.tu.CreateMessage(input)
+		_, err = h.tu.CreateMessage(ctx, req)
 		if err != nil {
 			errChan <- err
 			return
@@ -141,8 +144,9 @@ func (h *slackHandler) replaceSlackMentionEventText(event *slackevents.AppMentio
 }
 
 /*
-Slack Event APIを初めて利用する際にURLVerification(検証)を行うための処理
-https://api.slack.com/events/url_verification
+!Slack Event APIを初めて利用する際にURLVerification(検証)を行うための処理
+?https://api.slack.com/events/url_verification
+
 1.初めて登録するエンドポイントに対して、Slackからのリクエストが送れる
 2.リクエストに含まれるChallengeをそのままレスポンスで返すことで、そのエンドポイントの検証が完了し登録可能となる
 */

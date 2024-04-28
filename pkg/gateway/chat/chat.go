@@ -5,14 +5,14 @@ import "time"
 // Chatインターフェースは、中身がSlackであるかどうかを知らない
 
 type Chat interface {
-	PostMessage(input *ChatMessageInput) (*ChatMessageResponse, error)
+	PostMessage(input *PostMessageRequest) (*PostMessageResponse, error)
 }
 
-type ChatMessageInput struct {
+type PostMessageRequest struct {
 	ChannelID string
 	Message   string
 }
-type ChatMessageResponse struct {
+type PostMessageResponse struct {
 	ChannelID string
 	Message   string
 	PostAt    time.Time

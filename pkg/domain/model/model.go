@@ -18,6 +18,6 @@ type Message struct {
 	UpdatedAt time.Time
 }
 
-type CreateMessageInput struct {
+type CreateMessageRequest struct {
 	Content string
 }

@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 
@@ -11,7 +12,7 @@ import (
 )
 
 type MessageHandler interface {
-	ListMessages() ([]*model.Message, error)
+	ListMessages(ctx context.Context) ([]*model.Message, error)
 }
 
 type messageHandler struct {
@@ -24,16 +25,16 @@ func NewMessageHandler(tu usecase.MessageUsecase) MessageHandler {
 	}
 }
 
-func (h *messageHandler) ListMessages() ([]*model.Message, error) {
+func (h *messageHandler) ListMessages(ctx context.Context) ([]*model.Message, error) {
 	fmt.Println("========================ListMessages()が呼ばれました==============================")
 
-	msgs, err := h.tu.ListMessages()
+	msgs, err := h.tu.ListMessages(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	convMegs := lo.Map(msgs, func(msg *domain_model.Message, _ int) *model.Message {
-		return convMessage(msg)
+	convMegs := lo.Map(msgs, func(m *domain_model.Message, _ int) *model.Message {
+		return convMessage(m)
 	})
 
 	return convMegs, nil

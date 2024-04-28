@@ -1,6 +1,8 @@
 package infrastructure
 
 import (
+	"context"
+
 	gorm_model "github.com/fuku01/test-v2-api/db/model"
 	domain_model "github.com/fuku01/test-v2-api/pkg/domain/model"
 	"github.com/fuku01/test-v2-api/pkg/domain/repository"
@@ -18,7 +20,7 @@ func NewMessageRepository(db *gorm.DB) repository.MessageRepository {
 	}
 }
 
-func (r *messageRepository) ListMessages() ([]*domain_model.Message, error) {
+func (r *messageRepository) ListMessages(ctx context.Context) ([]*domain_model.Message, error) {
 
 	msgs := []*gorm_model.Message{}
 	err := r.db.Find(&msgs).Error // 論理削除されたデータは取得しない
@@ -33,9 +35,9 @@ func (r *messageRepository) ListMessages() ([]*domain_model.Message, error) {
 	return convMsgs, nil
 }
 
-func (r *messageRepository) CreateMessage(input *domain_model.CreateMessageInput) (*domain_model.Message, error) {
+func (r *messageRepository) CreateMessage(ctx context.Context, req *domain_model.CreateMessageRequest) (*domain_model.Message, error) {
 	msg := &domain_model.Message{
-		Content: input.Content,
+		Content: req.Content,
 	}
 
 	err := r.db.Create(msg).Error

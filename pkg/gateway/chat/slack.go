@@ -17,9 +17,9 @@ func NewSlack(slackToken string) (*Slack, error) {
 	}, nil
 }
 
-func (s *Slack) PostMessage(input *ChatMessageInput) (*ChatMessageResponse, error) {
+func (s *Slack) PostMessage(req *PostMessageRequest) (*PostMessageResponse, error) {
 
-	channel, postAt, err := s.client.PostMessage(input.ChannelID, slack.MsgOptionText(input.Message, false))
+	channel, postAt, err := s.client.PostMessage(req.ChannelID, slack.MsgOptionText(req.Message, false))
 	if err != nil {
 		return nil, err
 	}
@@ -29,9 +29,9 @@ func (s *Slack) PostMessage(input *ChatMessageInput) (*ChatMessageResponse, erro
 		return nil, err
 	}
 
-	return &ChatMessageResponse{
+	return &PostMessageResponse{
 		ChannelID: channel,
-		Message:   input.Message,
+		Message:   req.Message,
 		PostAt:    timePostAt,
 	}, nil
 }
