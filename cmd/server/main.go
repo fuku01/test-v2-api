@@ -8,17 +8,17 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/fuku01/test-v2-api/pkg/gateway/slack"
+	"github.com/fuku01/test-v2-api/pkg/gateway/chat"
 	graph "github.com/fuku01/test-v2-api/pkg/graph/generated"
 
 	"github.com/rs/cors"
 
 	"github.com/fuku01/test-v2-api/config"
 
-	h "github.com/fuku01/test-v2-api/pkg/handler/graph"
+	graph_handler "github.com/fuku01/test-v2-api/pkg/handler/graph"
 	message_handler "github.com/fuku01/test-v2-api/pkg/handler/graph"
 	webhook_handler "github.com/fuku01/test-v2-api/pkg/handler/webhook"
-	message_repository "github.com/fuku01/test-v2-api/pkg/infrastructure"
+	message_repository "github.com/fuku01/test-v2-api/pkg/infrastructure/mysql"
 	message_usecase "github.com/fuku01/test-v2-api/pkg/usecase"
 )
 
@@ -37,7 +37,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	slackClient, err := slack.NewSlack(slackToken)
+	slackClient, err := chat.NewSlack(slackToken)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,15 +49,15 @@ func main() {
 	tu := message_usecase.NewMessageUsecase(tr)
 	th := message_handler.NewMessageHandler(tu)
 
-	wh := webhook_handler.NewWebhookHandler(tu)
+	wh := webhook_handler.NewSlackHandler(tu)
 
-	h := h.Handler{
+	gh := graph_handler.GraphQLHandler{
 		MessageHandler: th,
 	}
 
 	// SlackEventAPI(Webhook) エンドポイントの設定
 	http.HandleFunc("/slack/events/verification", func(w http.ResponseWriter, r *http.Request) {
-		slack.SlackURLVerification(w, r)
+		wh.SlackURLVerification(w, r)
 	})
 	http.HandleFunc("/slack/events/create", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("========================SlackEventAPI(Webhook) が呼ばれました==============================")
@@ -67,7 +67,7 @@ func main() {
 	// GraphQL ルーティングするハンドラーの設定
 	srv := handler.NewDefaultServer(
 		graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
-			Handler: h,
+			Handler: gh,
 		}}),
 	)
 	// GraphQL ルーティングの設定

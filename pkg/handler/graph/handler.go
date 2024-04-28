@@ -1,5 +1,5 @@
 package graph
 
-type Handler struct {
+type GraphQLHandler struct {
 	MessageHandler MessageHandler
 }
