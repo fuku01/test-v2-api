@@ -2,11 +2,37 @@ package logger
 
 import (
 	"fmt"
+	"log"
 	"log/slog"
+	"os"
+	"path/filepath"
+	"runtime"
 )
 
 func Error(funcName string, err error) {
-	slog.Error(fmt.Sprintf("failed to %s", funcName), slog.String("err message", err.Error()))
+	_, file, line, ok := runtime.Caller(1) // エラーが発生したファイル名と行数を取得
+	if !ok {
+		log.Println("failed to runtime.Caller")
+		return
+	}
+	// カレントディレクトリを取得
+	currentDir, errDir := os.Getwd()
+	if errDir != nil {
+		log.Println("failed to get current directory")
+		return
+	}
+
+	// ファイルの相対パスを計算
+	relativePath, errRel := filepath.Rel(currentDir, file)
+	if errRel != nil {
+		log.Println("failed to get relative path")
+		return
+	}
+
+	slog.Error(fmt.Sprintf("error to %s", funcName),
+		slog.String("err message", err.Error()),
+		slog.String("file", relativePath),
+		slog.Int("line", line))
 }
 
 //! 一旦は導入見送りのためコメントアウト
