@@ -9,6 +9,7 @@ import (
 	"regexp"
 
 	"github.com/fuku01/test-v2-api/context/logger"
+	"github.com/fuku01/test-v2-api/pkg/domain/entity"
 	"github.com/fuku01/test-v2-api/pkg/usecase"
 	"github.com/slack-go/slack/slackevents"
 )
@@ -69,7 +70,7 @@ func (h *slackHandler) CreateTodo(w http.ResponseWriter, r *http.Request) {
 		}
 		message := h.replaceSlackMentionEventText(event)
 
-		req := &domain_model.CreateMessageRequest{
+		req := &entity.CreateMessageRequest{
 			Content: message,
 		}
 		_, err = h.tu.CreateMessage(ctx, req)
