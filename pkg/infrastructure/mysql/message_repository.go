@@ -1,10 +1,10 @@
-package infrastructure
+package repository
 
 import (
 	"context"
 
 	gorm_model "github.com/fuku01/test-v2-api/db/model"
-	domain_model "github.com/fuku01/test-v2-api/pkg/domain/model"
+	"github.com/fuku01/test-v2-api/pkg/domain/entity"
 	"github.com/fuku01/test-v2-api/pkg/domain/repository"
 	"github.com/samber/lo"
 	"gorm.io/gorm"
@@ -20,7 +20,7 @@ func NewMessageRepository(db *gorm.DB) repository.MessageRepository {
 	}
 }
 
-func (r *messageRepository) ListMessages(ctx context.Context) ([]*domain_model.Message, error) {
+func (r *messageRepository) ListMessages(ctx context.Context) ([]*entity.Message, error) {
 
 	msgs := []*gorm_model.Message{}
 	err := r.db.Find(&msgs).Error // 論理削除されたデータは取得しない
@@ -28,15 +28,15 @@ func (r *messageRepository) ListMessages(ctx context.Context) ([]*domain_model.M
 		return nil, err
 	}
 
-	convMsgs := lo.Map(msgs, func(msg *gorm_model.Message, _ int) *domain_model.Message {
+	convMsgs := lo.Map(msgs, func(msg *gorm_model.Message, _ int) *entity.Message {
 		return r.convMessage(msg)
 	})
 
 	return convMsgs, nil
 }
 
-func (r *messageRepository) CreateMessage(ctx context.Context, req *domain_model.CreateMessageRequest) (*domain_model.Message, error) {
-	msg := &domain_model.Message{
+func (r *messageRepository) CreateMessage(ctx context.Context, req *entity.CreateMessageRequest) (*entity.Message, error) {
+	msg := &entity.Message{
 		Content: req.Content,
 	}
 
@@ -49,12 +49,12 @@ func (r *messageRepository) CreateMessage(ctx context.Context, req *domain_model
 }
 
 // gormの型をドメインモデルの型に変換
-func (r *messageRepository) convMessage(msg *gorm_model.Message) *domain_model.Message {
+func (r *messageRepository) convMessage(msg *gorm_model.Message) *entity.Message {
 	if msg == nil {
 		return nil
 	}
 
-	return &domain_model.Message{
+	return &entity.Message{
 		ID:        msg.ID,
 		Content:   msg.Content,
 		CreatedAt: msg.CreatedAt,

@@ -7,12 +7,12 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/fuku01/test-v2-api/pkg/gateway/chat"
 	graph "github.com/fuku01/test-v2-api/pkg/graph/generated"
+	chat "github.com/fuku01/test-v2-api/pkg/infrastructure/slack"
 
 	"github.com/rs/cors"
 
-	"github.com/fuku01/test-v2-api/config"
+	"github.com/fuku01/test-v2-api/db/config"
 
 	graph_handler "github.com/fuku01/test-v2-api/pkg/handler/graph"
 	message_handler "github.com/fuku01/test-v2-api/pkg/handler/graph"

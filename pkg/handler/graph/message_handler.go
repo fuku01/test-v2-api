@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/fuku01/test-v2-api/pkg/context/logger"
-	domain_model "github.com/fuku01/test-v2-api/pkg/domain/model"
-	"github.com/fuku01/test-v2-api/pkg/gateway/chat"
+	"github.com/fuku01/test-v2-api/context/logger"
+	"github.com/fuku01/test-v2-api/pkg/domain/chat"
+	"github.com/fuku01/test-v2-api/pkg/domain/entity"
 	"github.com/fuku01/test-v2-api/pkg/graph/generated/model"
 	"github.com/fuku01/test-v2-api/pkg/usecase"
 	"github.com/samber/lo"
@@ -37,7 +37,7 @@ func (h *messageHandler) ListMessages(ctx context.Context) ([]*model.Message, er
 		return nil, InternalServerError
 	}
 
-	convMegs := lo.Map(msgs, func(m *domain_model.Message, _ int) *model.Message {
+	convMegs := lo.Map(msgs, func(m *entity.Message, _ int) *model.Message {
 		return convMessage(m)
 	})
 
@@ -67,7 +67,7 @@ func (h *messageHandler) PostMessage(ctx context.Context, req model.PostMessageI
 }
 
 // ドメインモデルの型をGraphQLの型に変換
-func convMessage(msg *domain_model.Message) *model.Message {
+func convMessage(msg *entity.Message) *model.Message {
 	if msg == nil {
 		return nil
 	}

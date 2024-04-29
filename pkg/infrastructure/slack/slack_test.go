@@ -1,9 +1,9 @@
-package mock
+package chat_test
 
 import (
 	"context"
 
-	"github.com/fuku01/test-v2-api/pkg/gateway/chat"
+	"github.com/fuku01/test-v2-api/pkg/domain/chat"
 )
 
 type MockChat interface {

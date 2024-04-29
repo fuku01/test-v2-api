@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	domain_model "github.com/fuku01/test-v2-api/pkg/domain/model"
+	domain_model "github.com/fuku01/test-v2-api/pkg/domain/entity"
 )
 
 type MessageRepository interface {

@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/fuku01/test-v2-api/pkg/domain/chat"
 	"github.com/slack-go/slack"
 )
 
@@ -26,7 +27,7 @@ func NewSlack() (*Slack, error) {
 	}, nil
 }
 
-func (s *Slack) PostMessage(ctx context.Context, req *PostMessageRequest) (*PostMessageResponse, error) {
+func (s *Slack) PostMessage(ctx context.Context, req *chat.PostMessageRequest) (*chat.PostMessageResponse, error) {
 	channel, postAt, err := s.client.PostMessage(req.ChannelID, slack.MsgOptionText(req.Message, false))
 	if err != nil {
 		return nil, err
@@ -39,7 +40,7 @@ func (s *Slack) PostMessage(ctx context.Context, req *PostMessageRequest) (*Post
 	}
 	timePostAt := time.Unix(int64(timestamp), 0)
 
-	return &PostMessageResponse{
+	return &chat.PostMessageResponse{
 		ChannelID: channel,
 		Message:   req.Message,
 		PostAt:    timePostAt,

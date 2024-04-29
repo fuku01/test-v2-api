@@ -8,8 +8,7 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/fuku01/test-v2-api/pkg/context/logger"
-	domain_model "github.com/fuku01/test-v2-api/pkg/domain/model"
+	"github.com/fuku01/test-v2-api/context/logger"
 	"github.com/fuku01/test-v2-api/pkg/usecase"
 	"github.com/slack-go/slack/slackevents"
 )
