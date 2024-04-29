@@ -1,6 +1,6 @@
 package graph
 
-import "github.com/fuku01/test-v2-api/pkg/handler/graph"
+import graph "github.com/fuku01/test-v2-api/pkg/handler/graphql"
 
 // This file will not be regenerated automatically.
 //

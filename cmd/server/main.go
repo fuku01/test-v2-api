@@ -8,17 +8,16 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	graph "github.com/fuku01/test-v2-api/pkg/graph/generated"
-	chat "github.com/fuku01/test-v2-api/pkg/infrastructure/slack"
 
 	"github.com/rs/cors"
 
 	"github.com/fuku01/test-v2-api/db/config"
 
-	graph_handler "github.com/fuku01/test-v2-api/pkg/handler/graph"
-	message_handler "github.com/fuku01/test-v2-api/pkg/handler/graph"
+	graphql_handler "github.com/fuku01/test-v2-api/pkg/handler/graphql"
 	webhook_handler "github.com/fuku01/test-v2-api/pkg/handler/webhook"
-	message_repository "github.com/fuku01/test-v2-api/pkg/infrastructure/mysql"
-	message_usecase "github.com/fuku01/test-v2-api/pkg/usecase"
+	repository "github.com/fuku01/test-v2-api/pkg/infrastructure/mysql"
+	chat "github.com/fuku01/test-v2-api/pkg/infrastructure/slack"
+	"github.com/fuku01/test-v2-api/pkg/usecase"
 )
 
 func httpHandlerFuncMiddleware(handlerFunc func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
@@ -45,13 +44,13 @@ func main() {
 	}
 
 	// 依存性の注入
-	tr := message_repository.NewMessageRepository(db)
-	tu := message_usecase.NewMessageUsecase(tr, chatClient)
-	th := message_handler.NewMessageHandler(tu)
+	tr := repository.NewMessageRepository(db)
+	tu := usecase.NewMessageUsecase(tr, chatClient)
+	th := graphql_handler.NewMessageHandler(tu)
 
 	wh := webhook_handler.NewSlackHandler(tu)
 
-	gh := graph_handler.GraphQLHandler{
+	gh := graphql_handler.GraphQLHandler{
 		MessageHandler: th,
 	}
 
