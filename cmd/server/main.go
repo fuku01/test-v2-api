@@ -37,8 +37,8 @@ func main() {
 		log.Fatalf("環境変数 PORT が設定されていません")
 	}
 
-	mispell := "misspell"
-	println(mispell)
+	Mispell := "Misspell"
+	println(Mispell)
 
 	db, err := config.NewDatabase()
 	if err != nil {

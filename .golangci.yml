@@ -11,6 +11,10 @@ linters-settings:
   errorlint:
     # Report non-wrapping error creation using fmt.Errorf
     errorf: true
+  severity-rules:
+    - linters:
+        - misspell
+      severity: error
 
 # どのlinterを有効にするかの設定
 linters:
