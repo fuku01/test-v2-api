@@ -1,35 +1,35 @@
-# # ワークフローの名前
-# name: Go CI Lint
+# ワークフローの名前
+name: Go CI Lint
 
-# # トリガーになるGitHubイベント
-# on:
-#   # デフォルトでプッシュされたときは実行される
-#   # プルリクエストがオープンされたとき
-#   pull_request:
+# トリガーになるGitHubイベント
+on:
+  # デフォルトでプッシュされたときは実行される
+  # プルリクエストがオープンされたとき
+  pull_request:
 
-# # ジョブの定義
-# jobs:
-#   golangci-lint:
-#     # GITHUB_TOKEN への権限設定
-#     permissions:
-#       checks: write # チェックの実行
-#       contents: read # リポジトリのコンテンツの読み取り
-#       pull-requests: write # プルリクエストへのコメント
-#     # 実行環境（ここではubuntu-latest(Linux)）
-#     runs-on: ubuntu-latest
-#     # ジョブの順序
-#     steps:
-#       - name: Check out code into the Go module directory
-#         uses: actions/checkout@v3 # リポジトリのチェックアウト
-#         with:
-#           fetch-depth: 0
-#       - name: Golangci-lint
-#         uses: reviewdog/action-golangci-lint@v2
-#         with:
-#           github_token: ${{ secrets.TOKEN }}
-#           go_version: "1.21"
-#           # reviewdog の動作モードの指定
-#           reporter: github-pr-review
-#           # Github Status へのレポートレベルの指定
-#           level: info
-#           golangci_lint_flags: "--config=.golangci.yml"
+# ジョブの定義
+jobs:
+  golangci-lint:
+    # GITHUB_TOKEN への権限設定
+    permissions:
+      checks: write # チェックの実行
+      contents: read # リポジトリのコンテンツの読み取り
+      pull-requests: write # プルリクエストへのコメント
+    # 実行環境（ここではubuntu-latest(Linux)）
+    runs-on: ubuntu-latest
+    # ジョブの順序
+    steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v3 # リポジトリのチェックアウト
+        with:
+          fetch-depth: 0
+      - name: Golangci-lint
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          go_version: "1.21"
+          # reviewdog の動作モードの指定
+          reporter: github-pr-review
+          # Github Status へのレポートレベルの指定
+          level: warning
+          golangci_lint_flags: "--config=.golangci.yml"
