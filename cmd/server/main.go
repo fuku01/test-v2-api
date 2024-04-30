@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -26,6 +28,8 @@ func httpHandlerFuncMiddleware(handlerFunc func(w http.ResponseWriter, r *http.R
 	}
 	return httpHandlerFunc
 }
+
+const requestTimeout = 5 * time.Minute
 
 func main() {
 	port := os.Getenv("PORT")
@@ -79,9 +83,17 @@ func main() {
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 
+	// サーバーの設定
+	server := &http.Server{
+		Addr:         fmt.Sprintf(":%s", port),
+		Handler:      httpHandler,
+		ReadTimeout:  requestTimeout,
+		WriteTimeout: requestTimeout,
+	}
+
 	// サーバーの起動
-	err = http.ListenAndServe(":"+port, httpHandler)
+	err = server.ListenAndServe()
 	if err != nil {
-		log.Fatalf("failed to start HTTP server: %v", err)
+		log.Fatalf("failed to start server: %v", err)
 	}
 }

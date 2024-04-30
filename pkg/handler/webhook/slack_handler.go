@@ -174,7 +174,10 @@ func (h *slackHandler) SlackURLVerification(w http.ResponseWriter, r *http.Reque
 	// リクエストのタイプがURL検証（url_verification）の場合は、チャレンジ（Challenge）を返す
 	if reqBody.Type == "url_verification" {
 		w.Header().Set("Content-Type", "text/plain")
-		w.Write([]byte(reqBody.Challenge))
+		if _, err := w.Write([]byte(reqBody.Challenge)); err != nil {
+			http.Error(w, "could not write response", http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 }

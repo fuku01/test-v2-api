@@ -3,7 +3,7 @@ services:
   api: # サービス名（API）
     build: # ビルドに使うDockerファイルのパス
       context: . # イメージのビルドコンテキストとして、現在のディレクトリを指定
-      dockerfile: ./docker/local/Dockerfile # ビルドに使うDockerファイルの相対パス
+      dockerfile: ./docker/Dockerfile # ビルドに使うDockerファイルの相対パス
     tty: true # コンテナの永続化（コンテナが終了しないようにする）
     environment: # 環境変数
       PORT: ${PORT}
