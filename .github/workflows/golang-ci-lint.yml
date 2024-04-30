@@ -8,7 +8,7 @@ on:
   pull_request:
 
 # ジョブの定義
-job:
+jobs:
   golangci-lint:
     # GITHUB_TOKEN への権限設定
     permissions:
