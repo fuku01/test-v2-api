@@ -19,6 +19,9 @@ COPY . .
 # apkでシステムレベルのパッケージをインストール（gitとmake）
 RUN apk add --no-cache --update git make
 
+# GolangCI-Lintのインストール
+RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin v1.57.2
+
 # go installでgoのライブラリをインストール（airとgqlgen、gomigrate）
 RUN go install github.com/cosmtrek/air@v1.49.0
 RUN go install github.com/99designs/gqlgen@latest
