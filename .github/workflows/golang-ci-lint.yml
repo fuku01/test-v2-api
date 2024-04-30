@@ -28,7 +28,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: "1.21"
       # !reviewdog/action-golangci-lint の実行
       - name: Reviewdog
         uses: reviewdog/action-golangci-lint@v2
@@ -42,8 +42,8 @@ jobs:
           golangci_lint_flags: "--config=.golangci.yml --timeout 5m"
       # !golangci-lint の実行
       - name: Golangci-lint
-          uses: golangci/golangci-lint-action@v3
-          with:
+        uses: golangci/golangci-lint-action@v3
+        with:
           # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
           version: v1.57.2
           # Optional: golangci-lint command line arguments.
