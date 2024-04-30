@@ -1,0 +1,55 @@
+run:
+  # 5分以上かかるときはタイムアウトさせる
+  timeout: 5m
+
+linters-settings:
+  exhaustive:
+    # indicates that switch statements are to be considered exhaustive if a
+    # 'default' case is present, even if all enum members aren't listed in the
+    # switch
+    default-signifies-exhaustive: true
+  errorlint:
+    # Report non-wrapping error creation using fmt.Errorf
+    errorf: true
+
+# どのlinterを有効にするかの設定
+linters:
+  # 一旦全て無効化
+  disable-all: true
+  # 有効にするlinterを指定
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - dogsled
+    - dupl
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - goconst
+    - godox
+    - gofmt
+    - gosec
+    - misspell
+    - unconvert
+    - unparam
+    - unused
+
+# 特定のlinterの設定
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
+        - dupl
+        - gosec
+    # 自動生成ファイルはlintしない
+    - path: .*/generated\.go
+      linters:
+        - "*"
+
+    - linters:
+        - gosec
+      text: "G404: " # Use of weak random number generator (math/rand instead of crypto/rand)

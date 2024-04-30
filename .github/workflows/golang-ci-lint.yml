@@ -1,0 +1,50 @@
+# ワークフローの名前
+name: Go CI Lint
+
+# トリガーになるGitHubイベント
+on:
+  # デフォルトでプッシュされたときは実行される
+  # プルリクエストがオープンされたとき
+  pull_request:
+
+# ジョブの定義
+jobs:
+  golangci-lint:
+    # GITHUB_TOKEN への権限設定
+    permissions:
+      checks: write # チェックの実行
+      contents: read # リポジトリのコンテンツの読み取り
+      pull-requests: write # プルリクエストへのコメント
+    # 実行環境（ここではubuntu-latest(Linux)）
+    runs-on: ubuntu-latest
+    # ジョブの順序
+    steps:
+      # !リポジトリのチェックアウト
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      # !Goのセットアップ
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+      # !reviewdog/action-golangci-lint の実行
+      - name: Reviewdog
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          go_version: "1.21"
+          # reviewdog の動作モードの指定
+          reporter: github-pr-review
+          # Github Status へのレポートレベルの指定
+          level: warning
+          golangci_lint_flags: "--config=.golangci.yml --timeout 5m"
+      # !golangci-lint の実行
+      - name: Golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
+          version: v1.57.2
+          # Optional: golangci-lint command line arguments.
+          args: --timeout 5m
