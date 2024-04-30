@@ -85,10 +85,10 @@ func main() {
 
 	// サーバーの設定
 	server := &http.Server{
-		Addr:         fmt.Sprintf(":%s", port),
-		Handler:      httpHandler,
-		ReadTimeout:  requestTimeout,
-		WriteTimeout: requestTimeout,
+		Addr:    fmt.Sprintf(":%s", port),
+		Handler: httpHandler,
+		// ReadTimeout:  requestTimeout,
+		// WriteTimeout: requestTimeout,
 	}
 
 	// サーバーの起動
