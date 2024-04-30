@@ -33,7 +33,7 @@ jobs:
       - name: Reviewdog
         uses: reviewdog/action-golangci-lint@v2
         with:
-          github_token: ${{ secrets.TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           go_version: "1.21"
           # reviewdog の動作モードの指定
           reporter: github-pr-review
