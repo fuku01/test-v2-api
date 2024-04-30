@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
+
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -36,9 +36,6 @@ func main() {
 	if port == "" {
 		log.Fatalf("環境変数 PORT が設定されていません")
 	}
-
-	Mispell := "Misspell"
-	println(Mispell)
 
 	db, err := config.NewDatabase()
 	if err != nil {
