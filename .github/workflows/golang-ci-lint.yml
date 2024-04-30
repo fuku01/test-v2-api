@@ -19,11 +19,18 @@ jobs:
     runs-on: ubuntu-latest
     # ジョブの順序
     steps:
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v3 # リポジトリのチェックアウト
+      # !リポジトリのチェックアウト
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Golangci-lint
+      # !Goのセットアップ
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      # !reviewdog/action-golangci-lint の実行
+      - name: Reviewdog
         uses: reviewdog/action-golangci-lint@v2
         with:
           github_token: ${{ secrets.TOKEN }}
@@ -32,4 +39,12 @@ jobs:
           reporter: github-pr-review
           # Github Status へのレポートレベルの指定
           level: warning
-          golangci_lint_flags: "--config=.golangci.yml"
+          golangci_lint_flags: "--config=.golangci.yml --timeout 5m"
+      # !golangci-lint の実行
+      - name: Golangci-lint
+          uses: golangci/golangci-lint-action@v3
+          with:
+          # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
+          version: v1.57.2
+          # Optional: golangci-lint command line arguments.
+          args: --timeout 5m
