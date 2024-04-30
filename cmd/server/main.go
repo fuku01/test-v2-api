@@ -30,6 +30,7 @@ func httpHandlerFuncMiddleware(handlerFunc func(w http.ResponseWriter, r *http.R
 }
 
 const requestTimeout = 5 * time.Minute
+const citest = "test"
 
 func main() {
 	port := os.Getenv("PORT")
