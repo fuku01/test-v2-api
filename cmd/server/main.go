@@ -73,11 +73,11 @@ func main() {
 	// GraphQL Playgroundの設定
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 
-	// CORSの設定
+	// CORSの設定（異なるオリジン(異なるドメインやプロトコル、ポート番号)からのリクエストを許可する）
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"}, // すべてのオリジンを許可
-		AllowCredentials: true,
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedOrigins:   []string{"*"},                            // すべてのオリジンを許可
+		AllowCredentials: true,                                     // クレデンシャル情報（Cookieなど）を許可
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"}, // 許可するHTTPメソッド
 	})
 	httpHandler := c.Handler(http.DefaultServeMux)
 
