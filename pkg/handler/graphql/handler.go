@@ -2,6 +2,7 @@ package graphql
 
 import "fmt"
 
+// 複数のHandlerを1つにまとめる
 type GraphQLHandler struct {
 	MessageHandler MessageHandler
 }
